@@ -25,6 +25,8 @@ class Service extends \think\Service
             $this->app->middleware->add($middleware, 'route');
         }
         $this->app->bind('auth', AuthGuard::class);
+        $this->app->bind('auth.permission', Permission::class);
+        $this->app->make('auth.permission');
         $this->registerAccessGate();
 
         // TODO: this method is deprecated and will be removed in doctrine/annotations 2.0
