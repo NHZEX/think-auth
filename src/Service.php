@@ -3,16 +3,13 @@ declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
-use app\Model\AdminUser;
 use Zxin\Think\Auth\Access\Gate;
-use Zxin\Think\Auth\Middleware\Authorize;
+use Zxin\Think\Auth\Contracts\Authenticatable;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
-use HZEX\Blade\Register;
 use think\App;
-use think\Service;
 
-class AuthService extends Service
+class Service extends \think\Service
 {
     /**
      * @var Reader
@@ -23,13 +20,12 @@ class AuthService extends Service
      */
     public function register()
     {
-        // 注册到容器
+        $middleware = $this->app->config->get('auth.middleware');
+        if ($middleware && class_exists($middleware)) {
+            $this->app->middleware->add($middleware, 'route');
+        }
         $this->app->bind('auth', AuthGuard::class);
-        // 注册鉴权中间件
-        $this->app->middleware->add(Authorize::class, 'route');
-        // 注册鉴权类
         $this->registerAccessGate();
-        $this->registeBladeExtension();
 
         // TODO: this method is deprecated and will be removed in doctrine/annotations 2.0
         AnnotationRegistry::registerLoader('class_exists');
@@ -53,10 +49,10 @@ class AuthService extends Service
 
     protected function registerUriGateAbilities(Gate $gate)
     {
-        $gate->define(Permission::class, function (AdminUser $user, string $uri) {
+        $gate->define(Permission::class, function (Authenticatable $user, string $uri) {
             return isset($user->permissions()[$uri]);
         });
-        $gate->before(function (AdminUser $user, string $uri) use ($gate) {
+        $gate->before(function (Authenticatable $user, string $uri) use ($gate) {
             if (!$gate->has($uri) && Permission::getInstance()->contain($uri)) {
                 $permissions = Permission::getInstance()->getPermissionsByFeature($uri) ?? $uri;
                 foreach ($permissions as $permission => $true) {
@@ -68,24 +64,6 @@ class AuthService extends Service
                 return false;
             }
             return null;
-        });
-    }
-
-    protected function registeBladeExtension()
-    {
-        /** @var Register $register */
-        $register = $this->app->make(Register::class);
-        $register->directive('allows', function ($parameter) {
-            return "<?php echo app('auth')->gate()->allows({$parameter}) ? 'true' : 'false' ?>";
-        });
-        $register->directive('denies', function ($parameter) {
-            return "<?php echo app('auth')->gate()->denies({$parameter}) ? 'true' : 'false' ?>";
-        });
-        $register->directive('check', function ($parameter) {
-            return "<?php echo app('auth')->gate()->check({$parameter}) ? 'true' : 'false' ?>";
-        });
-        $register->directive('any', function ($parameter) {
-            return "<?php echo app('auth')->gate()->any({$parameter}) ? 'true' : 'false' ?>";
         });
     }
 }

@@ -33,10 +33,10 @@ class AuthorizationException extends AuthException
     /**
      * Set the response from the gate.
      *
-     * @param  Response  $response
+     * @param  Response $response
      * @return $this
      */
-    public function setResponse($response)
+    public function setResponse(Response $response)
     {
         $this->response = $response;
 

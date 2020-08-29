@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Zxin\Think\Auth\Facade;
 
-use app\Model\AdminUser;
 use Zxin\Think\Auth\AuthGuard;
 use think\Facade;
+use Zxin\Think\Auth\Contracts\Authenticatable;
 
 /**
  * Class Auth
@@ -14,7 +14,7 @@ use think\Facade;
  * @method int|string id() static
  * @method int userGenre() static
  * @method int userRoleId() static
- * @method AdminUser user() static
+ * @method Authenticatable user() static
  * @method bool check() static
  * @method bool can(string $name) static
  */

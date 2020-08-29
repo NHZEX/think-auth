@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
-use app\Model\AdminUser as AdminUserModel;
+use think\helper\Str;
 use Zxin\Think\Auth\Access\Gate;
+use Zxin\Think\Auth\Contracts\Authenticatable;
 use Zxin\Think\Auth\Contracts\ProviderlSelfCheck;
+use Zxin\Think\Auth\Exception\AuthException;
 use Zxin\Think\Auth\Traits\EventHelpers;
 use Zxin\Think\Auth\Traits\GuardHelpers;
 use think\App;
@@ -58,7 +60,7 @@ class AuthGuard
     protected $viaRemember = false;
 
     /**
-     * @var AdminUserModel
+     * @var Authenticatable
      */
     protected $user;
 
@@ -124,9 +126,9 @@ class AuthGuard
     }
 
     /**
-     * @return AdminUserModel|null
+     * @return Authenticatable|null
      */
-    public function user(): ?AdminUserModel
+    public function user(): ?Authenticatable
     {
         if ($this->loggedOut) {
             return null;
@@ -144,7 +146,7 @@ class AuthGuard
 
         if (null === $this->user && null !== ($this->user = $this->validRememberToken())) {
             $this->createRememberToken($this->user);
-            $this->updateSession($this->user->id);
+            $this->updateSession($this->user->getIdentity());
             $this->attachUserInfo($this->user);
 
             $this->triggerLoginEvent($this->user, true);
@@ -212,15 +214,31 @@ class AuthGuard
         return $this->container->make(Gate::class);
     }
 
+    public function getProvider(int $id): Authenticatable
+    {
+        /** @var string $class */
+        $class = $this->config['provider'];
+        if (!class_exists($class)) {
+            throw new AuthException("auth provider({$class}) does not exist");
+        }
+        $implements = class_implements($class);
+        if ($implements === false) {
+            throw new AuthException("auth provider({$class}) load fail");
+        }
+        if (!isset($implements[Authenticatable::class])) {
+            throw new AuthException("auth provider({$class}) not implement " . Authenticatable::class);
+        }
+        return $class::getSelfProvider($id);
+    }
+
     /**
      * @param int $id
-     * @return AdminUserModel|null
+     * @return Authenticatable|null
      */
-    protected function retrieveById(int $id): ?AdminUserModel
+    protected function retrieveById(int $id): ?Authenticatable
     {
         try {
-            /** @var AdminUserModel $result */
-            $result = AdminUserModel::notAccessControl()->find($id);
+            $result = $this->getProvider($id);
             if ($result &&
                 $result instanceof ProviderlSelfCheck &&
                 !$result->valid($message)
@@ -230,14 +248,15 @@ class AuthGuard
                 return null;
             }
             return $result;
-        } catch (DataNotFoundException | ModelNotFoundException | DbException $e) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (DataNotFoundException | ModelNotFoundException | DbException $e) {
             return null;
         }
     }
 
-    public function login(AdminUserModel $user, bool $rememberme = false)
+    public function login(Authenticatable $user, bool $rememberme = false)
     {
-        $this->updateSession($user->id);
+        $this->updateSession($user->getIdentity());
         $this->attachUserInfo($user);
 
         if ($rememberme) {
@@ -255,7 +274,7 @@ class AuthGuard
     /**
      * Update the session with the given ID.
      *
-     * @param  string  $id
+     * @param  string|int  $id
      * @return void
      */
     protected function updateSession($id)
@@ -264,10 +283,11 @@ class AuthGuard
         $this->session->regenerate();
     }
 
-    protected function attachUserInfo(AdminUserModel $user)
+    protected function attachUserInfo(Authenticatable $user)
     {
-        $this->session->set($this->getName('genre'), $user->genre);
-        $this->session->set($this->getName('role_id'), $user->role_id);
+        foreach ($user->attachSessionInfo() as $key => $value) {
+            $this->session->set($this->getName($key), $value);
+        }
     }
 
     /**
@@ -295,7 +315,7 @@ class AuthGuard
         $this->loggedOut = true;
     }
 
-    protected function ensureRememberTokenIsSet(AdminUserModel $user)
+    protected function ensureRememberTokenIsSet(Authenticatable $user)
     {
         if (empty($user->getRememberToken())) {
             $this->cycleRememberToken($user);
@@ -303,10 +323,10 @@ class AuthGuard
     }
 
     /**
-     * @param AdminUserModel $user
+     * @param Authenticatable $user
      * @return void
      */
-    protected function createRememberToken(AdminUserModel $user)
+    protected function createRememberToken(Authenticatable $user)
     {
         $machineCode = $this->getAuthorization()->getMachine();
         if (empty($machineCode)) {
@@ -315,8 +335,7 @@ class AuthGuard
         $salt  = $this->getSecuritySalt();
         $expired = $this->config['remember']['expire'];
         $timeout = time() + $expired;
-        $password = hash('crc32', $user->password);
-        $token = "{$user->id}|{$user->getRememberToken()}|{$password}|{$timeout}";
+        $token = "{$user->getIdentity()}|{$user->getRememberToken()}|{$user->getRememberSecret()}|{$timeout}";
         $secret = encrypt_data($token, $salt, 'aes-128-ctr');
         $sign = hash_hmac('sha256', $secret, $machineCode . $salt, true);
         $secret = base64_encode($secret . $sign);
@@ -332,9 +351,9 @@ class AuthGuard
     }
 
     /**
-     * @return AdminUserModel|null
+     * @return Authenticatable|null
      */
-    protected function validRememberToken(): ?AdminUserModel
+    protected function validRememberToken(): ?Authenticatable
     {
         $machineCode = $this->getAuthorization()->getMachine();
         if (empty($machineCode)) {
@@ -365,7 +384,7 @@ class AuthGuard
         $user = $this->retrieveById((int) $userId);
         if (empty($user)
             || $rememberToken !== $user->getRememberToken()
-            || $pass !== hash('crc32', $user->password)
+            || $pass !== $user->getRememberSecret()
         ) {
             return null;
         }
@@ -373,16 +392,16 @@ class AuthGuard
         return $user;
     }
 
-    protected function cycleRememberToken(AdminUserModel $user)
+    protected function cycleRememberToken(Authenticatable $user)
     {
-        $user->updateRememberToken(get_rand_str(16));
+        $user->updateRememberToken(Str::random(16));
     }
 
     /**
-     * @param AdminUserModel $user
+     * @param Authenticatable $user
      * @return AuthGuard
      */
-    public function setUser(AdminUserModel $user)
+    public function setUser(Authenticatable $user)
     {
         $this->user = $user;
 
@@ -396,7 +415,7 @@ class AuthGuard
     /**
      * Get a unique identifier for the auth session value.
      *
-     * @param string $append
+     * @param string|null $append
      * @param string $join
      * @return string
      */

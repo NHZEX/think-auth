@@ -89,8 +89,6 @@ class Permission
     public function setPermission(array $permission): void
     {
         $this->loadStorage()->permission = $permission;
-
-        return;
     }
 
     /**

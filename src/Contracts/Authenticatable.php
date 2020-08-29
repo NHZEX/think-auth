@@ -13,4 +13,46 @@ interface Authenticatable
      * - 获取 Remember 令牌值
      * - 设置 Remember 令牌值
      */
+
+    /**
+     * @param int|string $id
+     * @return static
+     */
+    public static function getSelfProvider($id);
+
+    /**
+     * @return int|string
+     */
+    public function getIdentity();
+
+    /**
+     * @param string $permission
+     * @return bool
+     */
+    public function allowPermission(string $permission): bool;
+
+    /**
+     * @return array
+     */
+    public function permissions(): array;
+
+    /**
+     * @return array
+     */
+    public function attachSessionInfo(): array;
+
+    /**
+     * @return string
+     */
+    public function getRememberSecret(): string;
+
+    /**
+     * @return string
+     */
+    public function getRememberToken(): string;
+
+    /**
+     * @param string $token
+     */
+    public function updateRememberToken(string $token): void;
 }

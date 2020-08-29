@@ -56,7 +56,7 @@ trait InteractsWithScanAuth
         $dirs = array_map(function ($app) {
             return $this->baseDir . $app . DIRECTORY_SEPARATOR . $this->controllerLayer;
         }, $this->apps);
-        $dirs[] = $this->baseDir . $this->controllerLayer . DS;
+        $dirs[] = $this->baseDir . $this->controllerLayer . DIRECTORY_SEPARATOR;
 
         return $this->scanAnnotation($dirs);
     }
@@ -198,7 +198,6 @@ trait InteractsWithScanAuth
         }
 
         $baseName = $file->getBasename(".{$file->getExtension()}");
-        $className = $this->namespaces . $controllerPath . $baseName;
-        return $className;
+        return $this->namespaces . $controllerPath . $baseName;
     }
 }

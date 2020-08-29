@@ -33,7 +33,6 @@ class AuthScan
     /**
      * AuthScan constructor.
      * @param App $app
-     * @throws AnnotationException
      */
     public function __construct(App $app)
     {

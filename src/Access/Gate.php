@@ -184,7 +184,6 @@ class Gate
         }
     }
 
-
     public function raw($ability, $arguments = [])
     {
         $user = $this->resolveUser();
@@ -240,7 +239,7 @@ class Gate
      * @param  string  $ability
      * @param  array  $arguments
      * @param  bool  $result
-     * @return bool|null
+     * @return bool|Response|null
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
