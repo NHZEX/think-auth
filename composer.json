@@ -40,7 +40,6 @@
     "extra": {
         "think": {
             "services": [
-                "Zxin\\Think\\Auth\\Service"
             ],
             "config": {
                 "auth": "config/auth.php"
