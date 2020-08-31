@@ -171,30 +171,6 @@ class AuthGuard
     }
 
     /**
-     * @return int|null
-     */
-    public function userGenre()
-    {
-        if ($this->loggedOut) {
-            return null;
-        }
-
-        return $this->session->get($this->getName('genre'));
-    }
-
-    /**
-     * @return int|null
-     */
-    public function userRoleId()
-    {
-        if ($this->loggedOut) {
-            return null;
-        }
-
-        return $this->session->get($this->getName('role_id'));
-    }
-
-    /**
      * @return string
      */
     public function getHashId()
@@ -432,5 +408,25 @@ class AuthGuard
     public function getRecallerName()
     {
         return $this->config['remember']['name'];
+    }
+
+    public function __get($name)
+    {
+        if ($this->loggedOut) {
+            return null;
+        }
+
+        $name = $this->getName(Str::snake($name));
+        return $this->session->get($name);
+    }
+
+    public function __isset($name)
+    {
+        if ($this->loggedOut) {
+            return null;
+        }
+
+        $name = $this->getName(Str::snake($name));
+        return $this->session->has($name);
     }
 }
