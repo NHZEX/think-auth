@@ -3,6 +3,7 @@
 return [
     'provider' => null,
     'middleware' => null,
+    'permissions' => [],
     'remember' => [
         'name'   => 'remember',
         'expire' => 604800,  // 7 day
