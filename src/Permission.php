@@ -24,18 +24,23 @@ class Permission
 
     /**
      * 获取树
-     * @param array|null $data
-     * @param string     $index
-     * @param int        $level
+     * @param string        $index
+     * @param int           $level
+     * @param array|null    $data
+     * @param callable|null $filter
      * @return array
      */
     public function getTree(
         string $index = '__ROOT__',
         int $level = 0,
-        ?array $data = null
+        ?array $data = null,
+        callable $filter = null
     ) :array {
         if (null === $data) {
             $data = array_merge([], $this->loadStorage()->permission);
+            if ($data !== null) {
+                $data = $filter($data);
+            }
             usort($data, function ($a, $b) {
                 return $a['sort'] <=> $b['sort'];
             });
