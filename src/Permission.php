@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Zxin\Think\Auth;
 
 use think\App;
+use function is_callable;
 
 class Permission
 {
@@ -38,7 +39,7 @@ class Permission
     ) :array {
         if (null === $data) {
             $data = array_merge([], $this->loadStorage()->permission);
-            if ($data !== null) {
+            if (is_callable($data)) {
                 $data = $filter($data);
             }
             usort($data, function ($a, $b) {
