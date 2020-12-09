@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
+use think\Container;
 use Zxin\Think\Auth\Access\Gate;
 use Zxin\Think\Auth\Contracts\Authenticatable;
 use Doctrine\Common\Annotations\AnnotationRegistry;
@@ -44,25 +45,27 @@ class Service extends \think\Service
             $gate = (new Gate($app, function () use ($app) {
                 return $app->make('auth')->user();
             }));
-            $this->registerUriGateAbilities($gate);
+            $this->registerUriGateAbilities($gate, $app);
             return $gate;
         });
     }
 
-    protected function registerUriGateAbilities(Gate $gate)
+    protected function registerUriGateAbilities(Gate $gate, Container $container)
     {
         $gate->define(Permission::class, function (Authenticatable $user, string $uri) {
             return isset($user->permissions()[$uri]);
         });
-        $gate->before(function (Authenticatable $user, string $uri) use ($gate) {
-            if (!$gate->has($uri) && Permission::getInstance()->contain($uri)) {
-                $permissions = Permission::getInstance()->getPermissionsByFeature($uri) ?? $uri;
+        $gate->before(function (Authenticatable $user, string $uri) use ($gate, $container) {
+            $permissionObject = Permission::getInstance();
+            if (!$gate->has($uri) && $permissionObject->contain($uri)) {
+                $permissions = $permissionObject->getPermissionsByFeature($uri) ?? $uri;
                 foreach ($permissions as $permission => $true) {
                     if ($user->allowPermission($permission)) {
-                        // 权限授予
+                        AuthContext::create($uri, [$permission], true);
                         return true;
                     }
                 }
+                AuthContext::create($uri, $permissions, false);
                 return false;
             }
             return null;
