@@ -26,6 +26,11 @@ interface Authenticatable
     public function getIdentity();
 
     /**
+     * @return bool
+     */
+    public function isIgnoreAuthentication(): bool;
+
+    /**
      * @param string $permission
      * @return bool
      */

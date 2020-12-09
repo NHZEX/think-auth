@@ -57,6 +57,10 @@ class Service extends \think\Service
         });
         $gate->before(function (Authenticatable $user, string $uri) use ($gate, $container) {
             $permissionObject = Permission::getInstance();
+            if ($user->isIgnoreAuthentication()) {
+                AuthContext::createSuperRoot($uri);
+                return true;
+            }
             if (!$gate->has($uri) && $permissionObject->contain($uri)) {
                 $permissions = $permissionObject->getPermissionsByFeature($uri) ?? $uri;
                 foreach ($permissions as $permission => $true) {
