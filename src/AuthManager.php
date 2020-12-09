@@ -25,7 +25,7 @@ class AuthManager
 
     /**
      */
-    public static function user(): ?Authenticatable
+    public static function user():? Authenticatable
     {
         return self::instance()->user();
     }
@@ -36,5 +36,13 @@ class AuthManager
     public static function check(): bool
     {
         return self::instance()->check();
+    }
+
+    /**
+     * @return object|AuthContext|null
+     */
+    public static function context():? AuthContext
+    {
+        return AuthContext::get();
     }
 }
