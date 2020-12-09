@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Zxin\Think\Auth;
 
 use Zxin\Think\Auth\Annotation\Auth;
+use Zxin\Think\Auth\Annotation\AuthDescription;
 use Zxin\Think\Auth\Exception\AuthException;
 use Doctrine\Common\Annotations\Reader;
 use Generator;
@@ -113,21 +114,30 @@ trait InteractsWithScanAuth
                 $methodPath = $class . '::' . $methodName;
                 $annotations = $this->reader->getMethodAnnotations($refMethod);
                 foreach ($annotations as $auth) {
-                    if (!$auth instanceof Auth) {
-                        continue;
+                    if ($auth instanceof Auth) {
+                        if (empty($auth->value)) {
+                            throw new AuthException('annotation value not empty(Auth): ' . $methodPath);
+                        }
+                        $authStr = $this->parseAuth($auth->value, $controllerUrl, $methodName);
+                        $features = "node@{$nodeUrl}";
+                        $this->permissions[$authStr][$methodPath] = $features;
+                        // 记录节点控制信息
+                        $this->nodes[$features] = [
+                            'class'  => $methodPath,
+                            'policy' => $auth->policy,
+                            'desc'   => '',
+                        ];
+                    } elseif ($auth instanceof AuthDescription) {
+                        if (empty($auth->value)) {
+                            throw new AuthException('annotation value not empty(AuthDescription): ' . $methodPath);
+                        }
+                        $features = "node@{$nodeUrl}";
+                        if (isset($this->nodes[$features])) {
+                            $this->nodes[$features]['desc'] = $auth->value;
+                        } else {
+                            throw new AuthException('nodes not ready(AuthDescription): ' . $methodPath);
+                        }
                     }
-                    if (empty($auth->value)) {
-                        throw new AuthException('annotation value not empty: ' . $methodPath);
-                    }
-                    $authStr = $this->parseAuth($auth->value, $controllerUrl, $methodName);
-                    $features = "node@{$nodeUrl}";
-                    $this->permissions[$authStr][$methodPath] = $features;
-                    // 记录节点控制信息
-                    $this->nodes[$features] = [
-                        'class'  => $methodPath,
-                        'policy' => $auth->policy,
-                        'desc'   => $auth->desc,
-                    ];
                 }
 
                 $this->controllers[$class][$methodName] = $nodeUrl;
