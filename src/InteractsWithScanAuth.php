@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Zxin\Think\Auth;
 
 use Zxin\Think\Auth\Annotation\Auth;
-use Zxin\Think\Auth\Annotation\AuthDescription;
+use Zxin\Think\Auth\Annotation\AuthNode;
 use Zxin\Think\Auth\Exception\AuthException;
 use Doctrine\Common\Annotations\Reader;
 use Generator;
@@ -127,13 +127,14 @@ trait InteractsWithScanAuth
                             'policy' => $auth->policy,
                             'desc'   => '',
                         ];
-                    } elseif ($auth instanceof AuthDescription) {
+                    } elseif ($auth instanceof AuthNode) {
                         if (empty($auth->value)) {
                             throw new AuthException('annotation value not empty(AuthDescription): ' . $methodPath);
                         }
                         $features = "node@{$nodeUrl}";
                         if (isset($this->nodes[$features])) {
                             $this->nodes[$features]['desc'] = $auth->value;
+                            $this->nodes[$features]['policy'] = $auth->policy;
                         } else {
                             throw new AuthException('nodes not ready(AuthDescription): ' . $methodPath);
                         }

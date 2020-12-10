@@ -6,12 +6,12 @@ namespace Zxin\Think\Auth\Annotation;
 use Doctrine\Common\Annotations\Annotation;
 
 /**
- * 权限描述
+ * 权限节点
  * @package Zxin\Think\Auth\Annotation
  * @Annotation
  * @Annotation\Target({"CLASS", "METHOD"})
  */
-final class AuthDescription extends Annotation
+final class AuthNode extends Annotation
 {
     /**
      * 功能注解
@@ -19,4 +19,11 @@ final class AuthDescription extends Annotation
      * @var string
      */
     public $value = '';
+
+    /**
+     * 定义策略
+     *
+     * @var string
+     */
+    public $policy = '';
 }
