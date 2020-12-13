@@ -18,12 +18,10 @@ use function ksort;
  * @package Zxin\Think\Auth
  * @property Permission $permission
  */
-trait InteractsWithSyncModel
+trait InteractsWithStorage
 {
-    private $increase = 1;
-
     /**
-     * 刷新权限到数据库
+     * 刷新权限
      */
     public function refresh()
     {
@@ -65,7 +63,7 @@ trait InteractsWithSyncModel
         $this->export($output);
     }
 
-    public function export(array $data)
+    public function export(array $data): bool
     {
         $filename = app_path() . 'auth_storage.php';
 
@@ -154,7 +152,7 @@ trait InteractsWithSyncModel
      * @param string $permission
      * @return string
      */
-    protected function fillParent(array &$data, array $original, string $permission)
+    protected function fillParent(array &$data, array $original, string $permission): string
     {
         $delimiter = '.';
         $parents = explode($delimiter, $permission) ?: [];

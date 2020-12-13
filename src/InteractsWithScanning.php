@@ -26,7 +26,7 @@ use function substr;
  * @property App    $app
  * @property Reader $reader
  */
-trait InteractsWithScanAuth
+trait InteractsWithScanning
 {
     protected $baseDir;
     protected $controllerLayer;

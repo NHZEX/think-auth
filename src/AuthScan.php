@@ -10,8 +10,8 @@ use think\App;
 
 class AuthScan
 {
-    use InteractsWithScanAuth;
-    use InteractsWithSyncModel;
+    use InteractsWithScanning;
+    use InteractsWithStorage;
 
     const ROOT_NODE = '__ROOT__';
 
