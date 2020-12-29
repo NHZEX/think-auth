@@ -11,17 +11,14 @@
     ],
     "require": {
         "php": "^7.2|^8.0",
-        "ext-json": "*",
-        "ext-redis": "*",
         "doctrine/annotations": "^1.10",
-        "symfony/finder": "^4.2|^5.1",
         "symfony/polyfill-php80": "^1.18",
         "topthink/framework": "^6.0.3",
+        "zxin/think-annotation": "dev-master",
         "zxin/utils": "^2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7|^8",
-        "symfony/var-dumper": "^4.4|^5.0"
+        "phpunit/phpunit": "^8|^9"
     },
     "suggest": {
     },
@@ -50,5 +47,11 @@
         "sort-packages": true,
         "optimize-autoloader": false
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "repositories": [
+        {
+            "url": "../think-annotation",
+            "type": "path"
+        }
+    ]
 }
