@@ -58,10 +58,14 @@ class AuthScan
         $this->scanAnnotation();
 
         $output = $this->build();
+        $this->export($output);
+    }
 
+    public function export($value)
+    {
         $dump = new DumpValue(app_path() . 'auth_storage.php');
         $dump->load();
-        $dump->save($output);
+        $dump->save($value);
     }
 
     public function loadDefaultPermissions()
