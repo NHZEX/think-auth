@@ -14,7 +14,7 @@
         "doctrine/annotations": "^1.10",
         "symfony/polyfill-php80": "^1.18",
         "topthink/framework": "^6.0.3",
-        "zxin/think-annotation": "dev-master",
+        "zxin/think-annotation": "^1.0.2",
         "zxin/utils": "^2.0"
     },
     "require-dev": {
@@ -49,9 +49,5 @@
     },
     "minimum-stability": "stable",
     "repositories": [
-        {
-            "url": "../think-annotation",
-            "type": "path"
-        }
     ]
 }
