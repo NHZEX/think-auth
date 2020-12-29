@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
-use SplFileObject;
-use Symfony\Component\VarExporter\Exception\ExceptionInterface;
-use Symfony\Component\VarExporter\VarExporter;
 use function array_pop;
 use function array_values;
 use function count;
@@ -14,22 +11,16 @@ use function implode;
 use function ksort;
 
 /**
- * Trait InteractsWithSyncModel
+ * Trait InteractsWithStorage
  * @package Zxin\Think\Auth
- * @property Permission $permission
  */
 trait InteractsWithStorage
 {
-    /**
-     * 刷新权限
-     */
-    public function refresh()
+    protected function build(): array
     {
-        $this->scanAuthAnnotation();
-
         $output = [
-            'features'   => $this->getNodes(),
-            'permission' => $this->fillPermission($this->getPermissions(), []),
+            'features'   => $this->nodes,
+            'permission' => $this->fillPermission($this->permissions, []),
             'permission2features' => [],
             'features2permission' => [],
         ];
@@ -60,45 +51,7 @@ trait InteractsWithStorage
             }
         }
 
-        $this->export($output);
-    }
-
-    public function export(array $data): bool
-    {
-        $filename = app_path() . 'auth_storage.php';
-
-        if (is_file($filename) && is_readable($filename)) {
-            $sf = new SplFileObject($filename, 'r');
-            $sf->seek(2);
-            [, $lastHash] = explode(':', $sf->current() ?: ':');
-            $lastHash = trim($lastHash);
-            $contents = $sf->fread($sf->getSize() - $sf->ftell());
-            if ($lastHash !== md5($contents)) {
-                unset($lastHash);
-            }
-        }
-
-        try {
-            $nodes_data = VarExporter::export($data);
-        } catch (ExceptionInterface $e) {
-            $nodes_data = '[]';
-        }
-
-        $contents = "return {$nodes_data};\n";
-        $hash = md5($contents);
-
-        if (isset($lastHash) && $lastHash === $hash) {
-            return true;
-        }
-
-        $date = date('c');
-        $info = "// update date: {$date}\n// hash: {$hash}";
-
-        $tempname = stream_get_meta_data($tf = tmpfile())['uri'];
-        fwrite($tf, "<?php\n{$info}\n{$contents}");
-        copy($tempname, $filename);
-
-        return true;
+        return $output;
     }
 
     /**
