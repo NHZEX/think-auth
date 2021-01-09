@@ -190,7 +190,7 @@ class AuthGuard
         return $this->container->make(Gate::class);
     }
 
-    public function getProvider(int $id): Authenticatable
+    public function getProvider(int $id): ?Authenticatable
     {
         /** @var string $class */
         $class = $this->config['provider'];
