@@ -29,6 +29,13 @@ class AuthContext
     protected $permissionsDetails;
 
     /**
+     * AuthContext constructor.
+     */
+    protected function __construct()
+    {
+    }
+
+    /**
      * @return AuthContext|object|null
      */
     public static function get(): ?AuthContext
