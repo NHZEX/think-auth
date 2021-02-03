@@ -10,10 +10,10 @@ use Zxin\Think\Auth\Contracts\Authenticatable;
 /**
  * Class Auth
  * @package Zxin\Think\Auth\Facade
- * @method AuthGuard instance() static
- * @method int|string id() static
- * @method Authenticatable user() static
- * @method bool check() static
+ * @method static AuthGuard instance()
+ * @method static int|string id()
+ * @method static Authenticatable user()
+ * @method static bool check()
  */
 class Auth extends Facade
 {
