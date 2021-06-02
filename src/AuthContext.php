@@ -36,6 +36,14 @@ class AuthContext
     }
 
     /**
+     * @return bool
+     */
+    public static function has(): bool
+    {
+        return app()->has(AuthContext::class);
+    }
+
+    /**
      * @return AuthContext|object|null
      */
     public static function get(): ?AuthContext
