@@ -9,6 +9,8 @@ use Zxin\Think\Auth\Contracts\Authenticatable;
 use Doctrine\Common\Annotations\AnnotationRegistry;
 use Doctrine\Common\Annotations\Reader;
 use think\App;
+use function array_keys;
+use function class_exists;
 
 class Service extends \think\Service
 {
@@ -31,7 +33,7 @@ class Service extends \think\Service
         $this->registerAccessGate();
 
         // TODO: this method is deprecated and will be removed in doctrine/annotations 2.0
-        AnnotationRegistry::registerLoader('class_exists');
+        AnnotationRegistry::registerLoader('\class_exists');
     }
 
     public function boot()
@@ -56,20 +58,20 @@ class Service extends \think\Service
             return isset($user->permissions()[$uri]);
         });
         $gate->before(function (Authenticatable $user, string $uri) use ($gate, $container) {
-            $permissionObject = Permission::getInstance();
             if ($user->isIgnoreAuthentication()) {
                 AuthContext::createSuperRoot($uri);
                 return true;
             }
+            $permissionObject = Permission::getInstance();
             if (!$gate->has($uri) && $permissionObject->contain($uri)) {
-                $permissions = $permissionObject->getPermissionsByFeature($uri) ?? $uri;
+                $permissions = $permissionObject->getPermissionsByFeature($uri) ?? [];
                 foreach ($permissions as $permission => $true) {
                     if ($user->allowPermission($permission)) {
                         AuthContext::create($uri, [$permission], true);
                         return true;
                     }
                 }
-                AuthContext::create($uri, $permissions, false);
+                AuthContext::create($uri, array_keys($permissions), false);
                 return false;
             }
             return null;
