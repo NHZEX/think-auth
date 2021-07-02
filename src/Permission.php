@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace Zxin\Think\Auth;
 
 use think\App;
+use Zxin\Think\Auth\Exception\AuthException;
 use function is_callable;
+use function is_dir;
+use function str_replace;
 
 class Permission
 {
@@ -16,6 +19,22 @@ class Permission
     public static function getInstance(): Permission
     {
         return App::getInstance()->make(Permission::class);
+    }
+
+    public static function getDumpFilePath(string $filename = 'auth_storage.php'): string
+    {
+        $path = App::getInstance()->config->get('auth.dump_file_path');
+        if (empty($path)) {
+            $path = App::getInstance()->getAppPath();
+        }
+        $path = str_replace('\\', '/', $path);
+        if (!str_ends_with($path, '/')) {
+            $path .= '/';
+        }
+        if (!is_dir($path)) {
+            throw new AuthException("{$path} does not exist");
+        }
+        return $path . $filename;
     }
 
     public function __construct()
@@ -62,7 +81,7 @@ class Permission
     protected function loadStorage(): ?AuthStorage
     {
         if (empty($this->storage)) {
-            $filename = AuthScan::getDumpFilePath();
+            $filename = Permission::getDumpFilePath();
             /** @noinspection PhpIncludeInspection */
             $this->storage = new AuthStorage(require $filename);
         }
