@@ -32,7 +32,7 @@ class Service extends \think\Service
         $this->app->make('auth.permission');
         $this->registerAccessGate();
 
-        // TODO: this method is deprecated and will be removed in doctrine/annotations 2.0
+        // this method is deprecated（等待替换注解为php原生）
         AnnotationRegistry::registerLoader('\class_exists');
     }
 
