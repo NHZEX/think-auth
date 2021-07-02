@@ -29,7 +29,6 @@ class Service extends \think\Service
         }
         $this->app->bind('auth', AuthGuard::class);
         $this->app->bind('auth.permission', Permission::class);
-        $this->app->make('auth.permission');
         $this->registerAccessGate();
 
         // this method is deprecated（等待替换注解为php原生）
@@ -38,6 +37,7 @@ class Service extends \think\Service
 
     public function boot()
     {
+        Permission::getInstance();
     }
 
     protected function registerAccessGate()
