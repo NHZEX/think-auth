@@ -1,18 +1,16 @@
 <?php
-declare(strict_types=1);
 
 namespace Zxin\Think\Auth\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
 
 /**
- * 权限节点
+ * 节点描述
  * @package Zxin\Think\Auth\Annotation
  * @Annotation
  * @Annotation\Target({"CLASS", "METHOD"})
- * @deprecated()
  */
-final class AuthNode extends Annotation
+final class AuthMeta extends Annotation
 {
     /**
      * 功能注解

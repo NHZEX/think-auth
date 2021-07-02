@@ -12,8 +12,10 @@ use think\App;
 use Zxin\Think\Annotation\DumpValue;
 use Zxin\Think\Annotation\Scanning;
 use Zxin\Think\Auth\Annotation\Auth;
+use Zxin\Think\Auth\Annotation\AuthMeta;
 use Zxin\Think\Auth\Annotation\AuthNode;
 use Zxin\Think\Auth\Exception\AuthException;
+use function trigger_error;
 
 class AuthScan
 {
@@ -137,7 +139,13 @@ class AuthScan
                             'policy' => $auth->policy,
                             'desc'   => '',
                         ];
-                    } elseif ($auth instanceof AuthNode) {
+                    } elseif ($auth instanceof AuthMeta || $auth instanceof AuthNode) {
+                        if ($auth instanceof AuthNode) {
+                            @trigger_error(
+                                sprintf('%s is deprecated. Use %s instead.', AuthNode::class, AuthMeta::class),
+                                E_USER_DEPRECATED
+                            );
+                        }
                         if (empty($auth->value)) {
                             throw new AuthException('annotation value not empty(AuthDescription): ' . $methodPath);
                         }
