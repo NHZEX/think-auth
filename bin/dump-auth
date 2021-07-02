@@ -21,4 +21,9 @@ if (!isset($file)) {
 
 App::getInstance()->initialize();
 
-App::getInstance()->make(AuthScan::class)->refresh();
+echo '====== AuthDump ======' . PHP_EOL;
+/** @var AuthScan $scan */
+$scan = App::getInstance()->make(AuthScan::class);
+$scan->refresh();
+echo '========== DONE ==========' . PHP_EOL;
+
