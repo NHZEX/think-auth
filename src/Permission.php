@@ -16,9 +16,13 @@ class Permission
      */
     protected $storage = null;
 
-    public static function getInstance(): Permission
+    public static function getInstance($reset = false): Permission
     {
-        return App::getInstance()->make(Permission::class);
+        $app = App::getInstance();
+        if ($reset) {
+            $app->delete(Permission::class);
+        }
+        return $app->make(Permission::class);
     }
 
     public static function getDumpFilePath(string $filename = 'auth_storage.php'): string

@@ -7,11 +7,13 @@ namespace Zxin\Think\Validate;
 use Exception;
 use think\App;
 use Zxin\Think\Auth\AuthScan;
+use function file_exists;
 
-foreach ([__DIR__ . '/../../autoload.php', __DIR__ . '/../autoload.php', __DIR__ . '/../vendor/autoload.php', __DIR__ . '/vendor/autoload.php'] as $file) {
-    if (file_exists($file)) {
+foreach ([__DIR__ . '/../../../autoload.php', __DIR__ . '/../../autoload.php', __DIR__ . '/../autoload.php', __DIR__ . '/vendor/autoload.php',] as $_) {
+    if (file_exists($_)) {
         /** @noinspection PhpIncludeInspection */
-        require $file;
+        require $_;
+        $file = $_;
         break;
     }
 }
@@ -24,6 +26,7 @@ App::getInstance()->initialize();
 echo '====== AuthDump ======' . PHP_EOL;
 /** @var AuthScan $scan */
 $scan = App::getInstance()->make(AuthScan::class);
+$scan->setDebug(true);
 $scan->refresh();
 echo '========== DONE ==========' . PHP_EOL;
 

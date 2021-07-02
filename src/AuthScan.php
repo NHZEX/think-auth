@@ -15,6 +15,7 @@ use Zxin\Think\Auth\Annotation\Auth;
 use Zxin\Think\Auth\Annotation\AuthMeta;
 use Zxin\Think\Auth\Annotation\AuthNode;
 use Zxin\Think\Auth\Exception\AuthException;
+use function sprintf;
 use function str_replace;
 use function trigger_error;
 
@@ -43,6 +44,8 @@ class AuthScan
     protected $nodes = [];
     protected $controllers = [];
 
+    protected $debug = false;
+
     /**
      * AuthScan constructor.
      * @param App $app
@@ -54,6 +57,14 @@ class AuthScan
         $this->reader = new AnnotationReader();
 
         $this->permission = Permission::getInstance();
+    }
+
+    /**
+     * @param bool $debug
+     */
+    public function setDebug(bool $debug): void
+    {
+        $this->debug = $debug;
     }
 
     public function refresh()
@@ -158,6 +169,17 @@ class AuthScan
                             throw new AuthException('nodes not ready(AuthDescription): ' . $methodPath);
                         }
                     }
+                }
+
+                if ($this->debug && isset($features)) {
+                    echo sprintf(
+                        '> %s%s%s  => %s%s',
+                        $methodPath,
+                        $this->nodes[$features]['desc'] ? ": {$this->nodes[$features]['desc']}" : '',
+                        PHP_EOL,
+                        $features,
+                        PHP_EOL
+                    );
                 }
 
                 $this->controllers[$class][$methodName] = $nodeUrl;
