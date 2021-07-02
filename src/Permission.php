@@ -62,7 +62,7 @@ class Permission
     protected function loadStorage(): ?AuthStorage
     {
         if (empty($this->storage)) {
-            $filename = app_path() . 'auth_storage.php';
+            $filename = AuthScan::getDumpFilePath();
             /** @noinspection PhpIncludeInspection */
             $this->storage = new AuthStorage(require $filename);
         }

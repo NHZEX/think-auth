@@ -15,6 +15,9 @@ use Zxin\Think\Auth\Annotation\Auth;
 use Zxin\Think\Auth\Annotation\AuthMeta;
 use Zxin\Think\Auth\Annotation\AuthNode;
 use Zxin\Think\Auth\Exception\AuthException;
+use function is_dir;
+use function str_ends_with;
+use function str_replace;
 use function trigger_error;
 
 class AuthScan
@@ -42,6 +45,22 @@ class AuthScan
     protected $nodes = [];
     protected $controllers = [];
 
+    public static function getDumpFilePath(string $filename = 'auth_storage.php'): string
+    {
+        $path = App::getInstance()->config->get('auth.dump_file_path');
+        if (empty($path)) {
+            $path = App::getInstance()->getAppPath();
+        }
+        $path = str_replace('\\', '/', $path);
+        if (!str_ends_with($path, '/')) {
+            $path .= '/';
+        }
+        if (!is_dir($path)) {
+            throw new AuthException("{$path} does not exist");
+        }
+        return $path . $filename;
+    }
+
     /**
      * AuthScan constructor.
      * @param App $app
@@ -65,7 +84,7 @@ class AuthScan
 
     public function export($value)
     {
-        $dump = new DumpValue(app_path() . 'auth_storage.php');
+        $dump = new DumpValue(AuthScan::getDumpFilePath());
         $dump->load();
         $dump->save($value);
     }
