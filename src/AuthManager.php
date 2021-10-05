@@ -45,4 +45,17 @@ class AuthManager
     {
         return AuthContext::get();
     }
+
+    /**
+     * @param string $permission
+     * @return bool
+     */
+    public static function allowPermission(string $permission): bool
+    {
+        $user = self::user();
+        if (empty($user)) {
+            return false;
+        }
+        return isset($user->permissions()[$permission]);
+    }
 }

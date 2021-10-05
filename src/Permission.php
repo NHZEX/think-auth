@@ -86,7 +86,6 @@ class Permission
     {
         if (empty($this->storage)) {
             $filename = Permission::getDumpFilePath();
-            /** @noinspection PhpIncludeInspection */
             $this->storage = new AuthStorage(require $filename);
         }
         return $this->storage;
