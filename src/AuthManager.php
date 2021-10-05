@@ -47,15 +47,27 @@ class AuthManager
     }
 
     /**
+     * @return array|null
+     */
+    public static function getPermissions():? array
+    {
+        $user = self::user();
+        if (empty($user)) {
+            return null;
+        }
+        return $user->permissions();
+    }
+
+    /**
      * @param string $permission
      * @return bool
      */
     public static function allowPermission(string $permission): bool
     {
-        $user = self::user();
-        if (empty($user)) {
+        $permissions = self::getPermissions();
+        if (empty($permissions)) {
             return false;
         }
-        return isset($user->permissions()[$permission]);
+        return isset($permissions[$permission]);
     }
 }
