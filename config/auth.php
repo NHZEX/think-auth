@@ -9,4 +9,7 @@ return [
         'expire' => 604800,  // 7 day
     ],
     'dump_file_path' => null,
+    'record' => [
+        'adapter' => null,
+    ],
 ];
