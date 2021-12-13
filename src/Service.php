@@ -27,7 +27,10 @@ class Service extends \think\Service
         if ($middleware && class_exists($middleware)) {
             $this->app->middleware->add($middleware, 'route');
         }
-        $this->app->bind('auth', AuthGuard::class);
+        $guard = $this->app->config->get('auth.guardProvider');
+        // todo 临时方案
+        $this->app->bind(AuthGuard::class, $guard ?? AuthGuard::class);
+        $this->app->bind('auth', $guard ?? AuthGuard::class);
         $this->app->bind('auth.permission', Permission::class);
         $this->registerAccessGate();
 

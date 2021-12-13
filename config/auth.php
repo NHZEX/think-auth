@@ -3,6 +3,7 @@
 return [
     'provider' => null,
     'middleware' => null,
+    'guardProvider' => null,
     'permissions' => [],
     'remember' => [
         'name'   => 'remember',
