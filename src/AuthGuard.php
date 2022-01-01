@@ -6,6 +6,7 @@ namespace Zxin\Think\Auth;
 use think\helper\Str;
 use Zxin\Think\Auth\Access\Gate;
 use Zxin\Think\Auth\Contracts\Authenticatable;
+use Zxin\Think\Auth\Contracts\Guard;
 use Zxin\Think\Auth\Contracts\ProviderlSelfCheck;
 use Zxin\Think\Auth\Exception\AuthException;
 use Zxin\Think\Auth\Traits\EventHelpers;
@@ -22,7 +23,7 @@ use function hash_hmac;
 use function Zxin\Crypto\decrypt_data;
 use function Zxin\Crypto\encrypt_data;
 
-class AuthGuard
+class AuthGuard implements Guard
 {
     use GuardHelpers, EventHelpers;
 
@@ -103,6 +104,11 @@ class AuthGuard
     public function getSecuritySalt(): string
     {
         return env('DEPLOY_SECURITY_SALT');
+    }
+
+    public function validate(array $credentials = [])
+    {
+        throw new \LogicException('method not implemented');
     }
 
     /**
