@@ -14,6 +14,9 @@ class RecordContext
     /** @var int */
     protected $code = 0;
 
+    /** @var array|null */
+    protected $extra = null;
+
     /**
      * @param string $message
      * @return RecordContext
@@ -59,5 +62,21 @@ class RecordContext
     public function getCode(): int
     {
         return $this->code;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getExtra(): ?array
+    {
+        return $this->extra;
+    }
+
+    /**
+     * @param array|null $extra
+     */
+    public function setExtra(?array $extra): void
+    {
+        $this->extra = $extra;
     }
 }
