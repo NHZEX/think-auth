@@ -15,8 +15,14 @@ use Zxin\Think\Auth\Annotation\Auth;
 use Zxin\Think\Auth\Annotation\AuthMeta;
 use Zxin\Think\Auth\Annotation\AuthNode;
 use Zxin\Think\Auth\Exception\AuthException;
+use function array_merge;
+use function is_array;
 use function sprintf;
 use function str_replace;
+use function strlen;
+use function strpos;
+use function strtolower;
+use function substr;
 use function trigger_error;
 
 class AuthScan
@@ -144,7 +150,10 @@ class AuthScan
                         }
                         $authStr = $this->parseAuth($auth->value, $controllerUrl, $methodName);
                         $features = "node@{$nodeUrl}";
-                        $this->permissions[$authStr][$methodPath] = $features;
+                        if (isset($this->permissions[$authStr]['allow']) && !is_array($this->permissions[$authStr]['allow'])) {
+                            $this->permissions[$authStr]['allow'] = [];
+                        }
+                        $this->permissions[$authStr]['allow'][] = $features;
                         // 记录节点控制信息
                         $this->nodes[$features] = [
                             'class'  => $methodPath,
