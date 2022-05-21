@@ -14,6 +14,7 @@ use Zxin\Think\Annotation\Scanning;
 use Zxin\Think\Auth\Annotation\Auth;
 use Zxin\Think\Auth\Annotation\AuthMeta;
 use Zxin\Think\Auth\Annotation\AuthNode;
+use Zxin\Think\Auth\Annotation\Base;
 use Zxin\Think\Auth\Exception\AuthException;
 use function array_merge;
 use function is_array;
@@ -142,57 +143,87 @@ class AuthScan
 
                 $nodeUrl = $controllerUrl . '/' . strtolower($methodName);
                 $methodPath = $class . '::' . $methodName;
-                $annotations = $this->reader->getMethodAnnotations($refMethod);
-                foreach ($annotations as $auth) {
-                    if ($auth instanceof Auth) {
-                        if (empty($auth->value)) {
-                            throw new AuthException('annotation value not empty(Auth): ' . $methodPath);
-                        }
-                        $authStr = $this->parseAuth($auth->value, $controllerUrl, $methodName);
-                        $features = "node@{$nodeUrl}";
-                        if (isset($this->permissions[$authStr]['allow']) && !is_array($this->permissions[$authStr]['allow'])) {
-                            $this->permissions[$authStr]['allow'] = [];
-                        }
-                        $this->permissions[$authStr]['allow'][] = $features;
-                        // 记录节点控制信息
-                        $this->nodes[$features] = [
-                            'class'  => $methodPath,
-                            'policy' => $auth->policy,
-                            'desc'   => '',
-                        ];
-                    } elseif ($auth instanceof AuthMeta || $auth instanceof AuthNode) {
-                        if ($auth instanceof AuthNode) {
-                            @trigger_error(
-                                sprintf('%s is deprecated. Use %s instead.', AuthNode::class, AuthMeta::class),
-                                E_USER_DEPRECATED
-                            );
-                        }
-                        if (empty($auth->value)) {
-                            throw new AuthException('annotation value not empty(AuthDescription): ' . $methodPath);
-                        }
-                        $features = "node@{$nodeUrl}";
-                        if (isset($this->nodes[$features])) {
-                            $this->nodes[$features]['desc'] = $auth->value;
-                            $this->nodes[$features]['policy'] = $auth->policy;
-                        } else {
-                            throw new AuthException('nodes not ready(AuthDescription): ' . $methodPath);
-                        }
+
+                if (PHP_VERSION_ID >= 80000) {
+                    foreach ($refMethod->getAttributes(Base::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                        $this->handleAttributes($attribute->newInstance(), $methodPath, $nodeUrl, $controllerUrl, $methodName);
                     }
                 }
 
-                if ($this->debug && isset($features)) {
-                    echo sprintf(
-                        '> %s%s%s  => %s%s',
-                        $methodPath,
-                        $this->nodes[$features]['desc'] ? ": {$this->nodes[$features]['desc']}" : '',
-                        PHP_EOL,
-                        $features,
-                        PHP_EOL
-                    );
+                $annotations = $this->reader->getMethodAnnotations($refMethod);
+                foreach ($annotations as $auth) {
+                    if ($auth instanceof Base) {
+                        $this->handleAttributes($auth, $methodPath, $nodeUrl, $controllerUrl, $methodName);
+                    }
                 }
 
                 $this->controllers[$class][$methodName] = $nodeUrl;
             }
+        }
+    }
+
+    protected function handleAttributes(Base $obj, string $methodPath, string $nodeUrl, string $controllerUrl, string $methodName)
+    {
+        if ($obj instanceof Auth) {
+            $this->handleAuth($obj, $methodPath, $nodeUrl, $controllerUrl, $methodName);
+        } elseif ($obj instanceof AuthMeta || $obj instanceof AuthNode) {
+            $this->handleAuthMeta($obj, $methodPath, $nodeUrl);
+        }
+    }
+
+    protected function handleAuth(Auth $auth, string $methodPath, string $nodeUrl, string $controllerUrl, string $methodName): void
+    {
+        if (empty($auth->name)) {
+            throw new AuthException('annotation value not empty(Auth): ' . $methodPath);
+        }
+        $authStr = $this->parseAuth($auth->name, $controllerUrl, $methodName);
+        $features = "node@{$nodeUrl}";
+        if (isset($this->permissions[$authStr]['allow']) && !is_array($this->permissions[$authStr]['allow'])) {
+            $this->permissions[$authStr]['allow'] = [];
+        }
+        $this->permissions[$authStr]['allow'][] = $features;
+        // 记录节点控制信息
+        $this->nodes[$features] = [
+            'class'  => $methodPath,
+            'policy' => $auth->policy,
+            'desc'   => '',
+        ];
+
+        if ($this->debug) {
+            echo sprintf(
+                '> %s%s%s  => %s%s',
+                $methodPath,
+                $this->nodes[$features]['desc'] ? ": {$this->nodes[$features]['desc']}" : '',
+                PHP_EOL,
+                $features,
+                PHP_EOL
+            );
+        }
+    }
+
+    /**
+     * @param AuthMeta|AuthNode $auth
+     * @param string $methodPath
+     * @param string $nodeUrl
+     * @return void
+     */
+    protected function handleAuthMeta(Base $auth, string $methodPath, string $nodeUrl)
+    {
+        if ($auth instanceof AuthNode) {
+            @trigger_error(
+                sprintf('%s is deprecated. Use %s instead.', AuthNode::class, AuthMeta::class),
+                E_USER_DEPRECATED
+            );
+        }
+        if (empty($auth->value)) {
+            throw new AuthException('annotation value not empty(AuthDescription): ' . $methodPath);
+        }
+        $features = "node@{$nodeUrl}";
+        if (isset($this->nodes[$features])) {
+            $this->nodes[$features]['desc'] = $auth->value;
+            $this->nodes[$features]['policy'] = $auth->policy;
+        } else {
+            throw new AuthException('nodes not ready(AuthDescription): ' . $methodPath);
         }
     }
 

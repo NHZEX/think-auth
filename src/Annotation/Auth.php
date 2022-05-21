@@ -4,26 +4,37 @@ declare(strict_types=1);
 namespace Zxin\Think\Auth\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
+use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 
 /**
  * 权限注解
  * @package Zxin\Think\Auth\Annotation
  * @Annotation
  * @Annotation\Target({"CLASS", "METHOD"})
+ * @NamedArgumentConstructor
  */
-final class Auth extends Annotation
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+final class Auth extends Base
 {
     /**
      * 定义权限分配
      *
      * @var string
      */
-    public $value = 'login';
+    public string $name;
 
     /**
-     * 定义策略
+     * 定义权限策略
      *
      * @var string
      */
-    public $policy = '';
+    public string $policy;
+
+    public function __construct(
+        string $name = 'login',
+        string $policy = ''
+    ) {
+        $this->policy = $policy;
+        $this->name   = $name;
+    }
 }
