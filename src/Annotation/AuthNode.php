@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Zxin\Think\Auth\Annotation;
 
 use Doctrine\Common\Annotations\Annotation;
-use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 
 /**
  * 权限节点
@@ -12,9 +11,8 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
  * @Annotation
  * @Annotation\Target({"CLASS", "METHOD"})
  * @deprecated()
- * @NamedArgumentConstructor
  */
-final class AuthNode extends Base
+final class AuthNode extends Annotation
 {
     /**
      * 功能注解

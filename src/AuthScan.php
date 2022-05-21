@@ -24,7 +24,6 @@ use function strlen;
 use function strpos;
 use function strtolower;
 use function substr;
-use function trigger_error;
 
 class AuthScan
 {
@@ -48,7 +47,7 @@ class AuthScan
     protected $permission;
 
     protected $permissions = [];
-    protected $nodes = [];
+    protected $nodes       = [];
     protected $controllers = [];
 
     protected $debug = false;
@@ -91,14 +90,14 @@ class AuthScan
 
     public function loadDefaultPermissions()
     {
-        $default = App::getInstance()->config->get('auth.permissions', []);
+        $default           = App::getInstance()->config->get('auth.permissions', []);
         $this->permissions = array_merge($default, $this->permissions);
     }
 
     protected function scanAnnotation()
     {
         $this->permissions = [];
-        $this->nodes = [];
+        $this->nodes       = [];
         $this->controllers = [];
 
         $this->loadDefaultPermissions();
@@ -115,17 +114,17 @@ class AuthScan
                 continue;
             }
 
-            $namespaces = $scanning->getControllerNamespaces();
+            $namespaces      = $scanning->getControllerNamespaces();
             $controllerLayer = $scanning->getControllerLayer();
             // 是否多应用
             $isApp = (0 !== strpos($class, $namespaces . $controllerLayer));
 
             if ($isApp) {
                 $controllerUrl = substr($class, strlen($namespaces));
-                $appPos = strpos($controllerUrl, '\\');
-                $appName = substr($controllerUrl, 0, $appPos);
+                $appPos        = strpos($controllerUrl, '\\');
+                $appName       = substr($controllerUrl, 0, $appPos);
                 $controllerUrl = substr($controllerUrl, $appPos + strlen($controllerLayer . '\\') + 1);
-                $controllerUrl = $appName. '/' . strtolower(str_replace('\\', '.', $controllerUrl));
+                $controllerUrl = $appName . '/' . strtolower(str_replace('\\', '.', $controllerUrl));
             } else {
                 $controllerUrl = substr($class, strlen($namespaces . $controllerLayer . '\\'));
                 $controllerUrl = strtolower(str_replace('\\', '.', $controllerUrl));
@@ -141,7 +140,7 @@ class AuthScan
                     continue;
                 }
 
-                $nodeUrl = $controllerUrl . '/' . strtolower($methodName);
+                $nodeUrl    = $controllerUrl . '/' . strtolower($methodName);
                 $methodPath = $class . '::' . $methodName;
 
                 if (PHP_VERSION_ID >= 80000) {
@@ -154,6 +153,11 @@ class AuthScan
                 foreach ($annotations as $auth) {
                     if ($auth instanceof Base) {
                         $this->handleAttributes($auth, $methodPath, $nodeUrl, $controllerUrl, $methodName);
+                    } elseif ($auth instanceof AuthNode) {
+                        throw new \RuntimeException(
+                            sprintf('%s is deprecated. Use %s instead.', AuthNode::class, AuthMeta::class),
+                            E_USER_DEPRECATED
+                        );
                     }
                 }
 
@@ -162,11 +166,19 @@ class AuthScan
         }
     }
 
+    /**
+     * @param Base   $obj
+     * @param string $methodPath
+     * @param string $nodeUrl
+     * @param string $controllerUrl
+     * @param string $methodName
+     * @return void
+     */
     protected function handleAttributes(Base $obj, string $methodPath, string $nodeUrl, string $controllerUrl, string $methodName)
     {
         if ($obj instanceof Auth) {
             $this->handleAuth($obj, $methodPath, $nodeUrl, $controllerUrl, $methodName);
-        } elseif ($obj instanceof AuthMeta || $obj instanceof AuthNode) {
+        } elseif ($obj instanceof AuthMeta) {
             $this->handleAuthMeta($obj, $methodPath, $nodeUrl);
         }
     }
@@ -176,7 +188,7 @@ class AuthScan
         if (empty($auth->name)) {
             throw new AuthException('annotation value not empty(Auth): ' . $methodPath);
         }
-        $authStr = $this->parseAuth($auth->name, $controllerUrl, $methodName);
+        $authStr  = $this->parseAuth($auth->name, $controllerUrl, $methodName);
         $features = "node@{$nodeUrl}";
         if (isset($this->permissions[$authStr]['allow']) && !is_array($this->permissions[$authStr]['allow'])) {
             $this->permissions[$authStr]['allow'] = [];
@@ -202,25 +214,19 @@ class AuthScan
     }
 
     /**
-     * @param AuthMeta|AuthNode $auth
-     * @param string $methodPath
-     * @param string $nodeUrl
+     * @param AuthMeta $auth
+     * @param string   $methodPath
+     * @param string   $nodeUrl
      * @return void
      */
-    protected function handleAuthMeta(Base $auth, string $methodPath, string $nodeUrl)
+    protected function handleAuthMeta(AuthMeta $auth, string $methodPath, string $nodeUrl): void
     {
-        if ($auth instanceof AuthNode) {
-            @trigger_error(
-                sprintf('%s is deprecated. Use %s instead.', AuthNode::class, AuthMeta::class),
-                E_USER_DEPRECATED
-            );
-        }
-        if (empty($auth->value)) {
+        if (empty($auth->desc)) {
             throw new AuthException('annotation value not empty(AuthDescription): ' . $methodPath);
         }
         $features = "node@{$nodeUrl}";
         if (isset($this->nodes[$features])) {
-            $this->nodes[$features]['desc'] = $auth->value;
+            $this->nodes[$features]['desc']   = $auth->desc;
             $this->nodes[$features]['policy'] = $auth->policy;
         } else {
             throw new AuthException('nodes not ready(AuthDescription): ' . $methodPath);

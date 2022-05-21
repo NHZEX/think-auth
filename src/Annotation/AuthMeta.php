@@ -12,6 +12,7 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
  * @Annotation\Target({"CLASS", "METHOD"})
  * @NamedArgumentConstructor
  */
+#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class AuthMeta extends Base
 {
     /**
@@ -19,12 +20,18 @@ final class AuthMeta extends Base
      *
      * @var string
      */
-    public $value = '';
+    public string $desc;
 
     /**
      * 定义策略
      *
      * @var string
      */
-    public $policy = '';
+    public string $policy;
+
+    public function __construct(string $desc, string $policy = '')
+    {
+        $this->desc = $desc;
+        $this->policy = $policy;
+    }
 }
