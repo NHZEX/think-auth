@@ -3,14 +3,6 @@ declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
-use think\helper\Str;
-use Zxin\Think\Auth\Access\Gate;
-use Zxin\Think\Auth\Contracts\Authenticatable;
-use Zxin\Think\Auth\Contracts\Guard;
-use Zxin\Think\Auth\Contracts\ProviderlSelfCheck;
-use Zxin\Think\Auth\Exception\AuthException;
-use Zxin\Think\Auth\Traits\EventHelpers;
-use Zxin\Think\Auth\Traits\GuardHelpers;
 use think\App;
 use think\Config;
 use think\Container;
@@ -18,7 +10,15 @@ use think\Cookie as CookieJar;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
+use think\helper\Str;
 use think\Session;
+use Zxin\Think\Auth\Access\Gate;
+use Zxin\Think\Auth\Contracts\Authenticatable;
+use Zxin\Think\Auth\Contracts\Guard;
+use Zxin\Think\Auth\Contracts\ProviderlSelfCheck;
+use Zxin\Think\Auth\Exception\AuthException;
+use Zxin\Think\Auth\Traits\EventHelpers;
+use Zxin\Think\Auth\Traits\GuardHelpers;
 use function hash_hmac;
 use function Zxin\Crypto\decrypt_data;
 use function Zxin\Crypto\encrypt_data;
@@ -196,9 +196,13 @@ class AuthGuard implements Guard
         return $this->container->make(Gate::class);
     }
 
-    public function getProvider(int $id): ?Authenticatable
+    /**
+     * @param int|string $id
+     * @return Authenticatable|null
+     */
+    public function getProvider($id): ?Authenticatable
     {
-        /** @var string $class */
+        /** @var class-string<Authenticatable::class> $class */
         $class = $this->config['provider'];
         if (!class_exists($class)) {
             throw new AuthException("auth provider({$class}) does not exist");
@@ -214,10 +218,10 @@ class AuthGuard implements Guard
     }
 
     /**
-     * @param int $id
+     * @param int|string $id
      * @return Authenticatable|null
      */
-    protected function retrieveById(int $id): ?Authenticatable
+    protected function retrieveById($id): ?Authenticatable
     {
         try {
             $result = $this->getProvider($id);
