@@ -43,9 +43,6 @@ class AuthContext
         return app()->has(AuthContext::class);
     }
 
-    /**
-     * @return AuthContext|object|null
-     */
     public static function get(): ?AuthContext
     {
         $app = app();
@@ -112,7 +109,7 @@ class AuthContext
     }
 
     /**
-     * @return string[]|null
+     * @return array<string, array|null>
      */
     public function getPermissionsDetails(): ?array
     {

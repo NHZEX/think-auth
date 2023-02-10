@@ -26,7 +26,7 @@ interface StatefulGuard extends Guard
     /**
      * Log a user into the application.
      *
-     * @param  mixed  $user
+     * @param  Authenticatable  $user
      * @param  bool  $remember
      * @return void
      */

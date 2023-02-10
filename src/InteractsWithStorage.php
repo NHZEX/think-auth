@@ -102,7 +102,7 @@ trait InteractsWithStorage
     protected function fillParent(array &$data, array $original, string $permission): string
     {
         $delimiter = '.';
-        $parents = explode($delimiter, $permission) ?: [];
+        $parents = explode($delimiter, $permission);
         if (1 === \count($parents)) {
             return self::ROOT_NODE;
         }

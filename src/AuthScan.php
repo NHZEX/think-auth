@@ -191,9 +191,8 @@ class AuthScan
 
         if ($this->debug) {
             echo sprintf(
-                '> %s%s%s  => %s%s',
+                '> %s%s%s  => %s',
                 $methodPath,
-                $this->nodes[$features]['desc'] ? ": {$this->nodes[$features]['desc']}" : '',
                 PHP_EOL,
                 $features,
                 PHP_EOL

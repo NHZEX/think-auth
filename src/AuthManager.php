@@ -38,9 +38,6 @@ class AuthManager
         return self::instance()->check();
     }
 
-    /**
-     * @return object|AuthContext|null
-     */
     public static function context(): ?AuthContext
     {
         return AuthContext::get();

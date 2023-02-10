@@ -23,7 +23,7 @@ class Gate
     protected $userResolver;
 
     /**
-     * @var array
+     * @var array<string, string|callable>
      */
     protected $abilities = [];
 
@@ -41,7 +41,7 @@ class Gate
      */
     protected $afterCallbacks = [];
 
-    public function __construct(
+    final public function __construct(
         Container $container,
         callable $userResolver,
         array $abilities = [],
@@ -83,11 +83,8 @@ class Gate
 
     /**
      * 是否存在能力
-     *
-     * @param string[] $abilitys
-     * @return bool
      */
-    public function has(...$abilitys): bool
+    public function has(string ...$abilitys): bool
     {
         foreach ($abilitys as $ability) {
             if (!isset($this->abilities[$this->getAlias($ability)])) {
@@ -203,9 +200,9 @@ class Gate
      * @param mixed  $user
      * @param string $ability
      * @param array  $arguments
-     * @return bool
+     * @return mixed
      */
-    protected function callAuthCallback($user, $ability, array $arguments)
+    protected function callAuthCallback($user, string $ability, array $arguments)
     {
         array_unshift($arguments, $user);
         try {
@@ -239,8 +236,8 @@ class Gate
      * @param  $user
      * @param  string  $ability
      * @param  array  $arguments
-     * @param  bool  $result
-     * @return bool|Response|null
+     * @param  mixed  $result
+     * @return mixed
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {

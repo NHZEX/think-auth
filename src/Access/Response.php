@@ -32,12 +32,10 @@ class Response
     /**
      * Create a new response.
      *
-     * @param  bool  $allowed
-     * @param  string  $message
      * @param  mixed  $code
      * @return void
      */
-    public function __construct($allowed, $message = '', $code = null)
+    final public function __construct(bool $allowed, ?string $message = '', $code = null)
     {
         $this->code = $code;
         $this->allowed = $allowed;
@@ -51,7 +49,7 @@ class Response
      * @param mixed       $code
      * @return Response
      */
-    public static function allow($message = null, $code = null)
+    public static function allow(?string $message = null, $code = null)
     {
         return new static(true, $message, $code);
     }
@@ -63,7 +61,7 @@ class Response
      * @param mixed $code
      * @return Response
      */
-    public static function deny($message = null, $code = null)
+    public static function deny(?string $message = null, $code = null)
     {
         return new static(false, $message, $code);
     }

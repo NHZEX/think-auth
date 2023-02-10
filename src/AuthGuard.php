@@ -63,7 +63,7 @@ class AuthGuard implements Guard
     protected $viaRemember = false;
 
     /**
-     * @var Authenticatable
+     * @var Authenticatable|null
      */
     protected $user;
 
@@ -204,7 +204,7 @@ class AuthGuard implements Guard
      */
     public function getProvider($id): ?Authenticatable
     {
-        /** @var class-string<Authenticatable::class> $class */
+        /** @var class-string<Authenticatable> $class */
         $class = $this->config['provider'];
         if (!class_exists($class)) {
             throw new AuthException("auth provider({$class}) does not exist");
@@ -435,7 +435,7 @@ class AuthGuard implements Guard
     public function __isset($name)
     {
         if ($this->loggedOut) {
-            return null;
+            return false;
         }
 
         $name = $this->getName(Str::snake($name));

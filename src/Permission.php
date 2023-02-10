@@ -9,10 +9,7 @@ use Zxin\Think\Auth\Exception\AuthException;
 
 class Permission
 {
-    /**
-     * @var AuthStorage
-     */
-    protected $storage = null;
+    protected ?AuthStorage $storage = null;
 
     public static function getInstance($reset = false): Permission
     {

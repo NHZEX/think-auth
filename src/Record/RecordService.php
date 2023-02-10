@@ -43,7 +43,7 @@ class RecordService extends Service
     }
 
     /**
-     * @return RecordAdapterInterface|object
+     * @return RecordAdapterInterface
      */
     protected function getRecordAdapter(): RecordAdapterInterface
     {

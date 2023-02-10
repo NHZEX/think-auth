@@ -7,7 +7,6 @@ namespace Zxin\Think\Auth;
 use Closure;
 use RuntimeException;
 use think\App;
-use think\Container;
 use Zxin\Think\Auth\Access\Gate;
 use Zxin\Think\Auth\Contracts\Authenticatable;
 use Zxin\Think\Auth\Contracts\Guard;
@@ -73,17 +72,17 @@ class Service extends \think\Service
             $gate = (new Gate($app, function () use ($app) {
                 return $app->make('auth')->user();
             }));
-            $this->registerUriGateAbilities($gate, $app);
+            $this->registerUriGateAbilities($gate);
             return $gate;
         });
     }
 
-    protected function registerUriGateAbilities(Gate $gate, Container $container)
+    protected function registerUriGateAbilities(Gate $gate)
     {
         $gate->define(Permission::class, function (Authenticatable $user, string $uri) {
             return isset($user->permissions()[$uri]);
         });
-        $gate->before(function (Authenticatable $user, string $uri) use ($gate, $container) {
+        $gate->before(function (Authenticatable $user, string $uri) use ($gate) {
             if ($user->isIgnoreAuthentication()) {
                 AuthContext::createSuperRoot($uri);
                 return true;
