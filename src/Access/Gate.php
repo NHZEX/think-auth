@@ -285,9 +285,7 @@ class Gate
      */
     public function forUser($user)
     {
-        $callback = function () use ($user) {
-            return $user;
-        };
+        $callback = fn() => $user;
 
         // 可以考虑使用 clone 实现
         return new static($this->container, $callback, $this->abilities, $this->beforeCallbacks, $this->afterCallbacks);

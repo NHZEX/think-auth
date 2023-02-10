@@ -33,9 +33,7 @@ class Service extends \think\Service
 
     protected function registerGuard()
     {
-        $this->app->bind(Guard::class, function (App $app) {
-            return $this->guardInstance($app);
-        });
+        $this->app->bind(Guard::class, fn(App $app) => $this->guardInstance($app));
         $this->app->bind(AuthGuard::class, Guard::class);
         $this->app->bind('auth', Guard::class);
     }
@@ -69,9 +67,7 @@ class Service extends \think\Service
     {
         $this->app->bind('auth.gate', Gate::class);
         $this->app->bind(Gate::class, function (App $app) {
-            $gate = (new Gate($app, function () use ($app) {
-                return $app->make('auth')->user();
-            }));
+            $gate = (new Gate($app, fn() => $app->make('auth')->user()));
             $this->registerUriGateAbilities($gate);
             return $gate;
         });
@@ -79,9 +75,7 @@ class Service extends \think\Service
 
     protected function registerUriGateAbilities(Gate $gate)
     {
-        $gate->define(Permission::class, function (Authenticatable $user, string $uri) {
-            return isset($user->permissions()[$uri]);
-        });
+        $gate->define(Permission::class, fn(Authenticatable $user, string $uri) => isset($user->permissions()[$uri]));
         $gate->before(function (Authenticatable $user, string $uri) use ($gate) {
             if ($user->isIgnoreAuthentication()) {
                 AuthContext::createSuperRoot($uri);
@@ -90,7 +84,7 @@ class Service extends \think\Service
             $permissionObject = Permission::getInstance();
             if (!$gate->has($uri) && $permissionObject->contain($uri)) {
                 $permissions = $permissionObject->getPermissionsByFeature($uri) ?? [];
-                foreach ($permissions as $permission => $true) {
+                foreach ($permissions as $permission => $_) {
                     if ($user->allowPermission($permission)) {
                         AuthContext::create($uri, [$permission], true);
                         return true;

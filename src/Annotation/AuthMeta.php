@@ -18,15 +18,11 @@ final class AuthMeta extends Base
 {
     /**
      * 功能注解
-     *
-     * @var string
      */
     public string $desc;
 
     /**
      * 定义策略
-     *
-     * @var string
      */
     public string $policy;
 

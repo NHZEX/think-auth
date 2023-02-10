@@ -60,9 +60,7 @@ class Permission
             if (\is_callable($data)) {
                 $data = $filter($data);
             }
-            usort($data, function ($a, $b) {
-                return $a['sort'] <=> $b['sort'];
-            });
+            usort($data, fn($a, $b) => $a['sort'] <=> $b['sort']);
         }
         $tree = [];
         foreach ($data as $permission) {

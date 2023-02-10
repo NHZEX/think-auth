@@ -20,15 +20,11 @@ final class Auth extends Base
 {
     /**
      * 定义权限分配
-     *
-     * @var string
      */
     public string $name;
 
     /**
      * 定义权限策略
-     *
-     * @var string
      */
     public string $policy;
 
