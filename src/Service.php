@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
+use think\App;
 use think\Container;
 use Zxin\Think\Auth\Access\Gate;
 use Zxin\Think\Auth\Contracts\Authenticatable;
-use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\Reader;
-use think\App;
 use Zxin\Think\Auth\Contracts\Guard;
 use function array_keys;
 use function class_exists;
@@ -20,11 +18,6 @@ use function is_subclass_of;
 class Service extends \think\Service
 {
     /**
-     * @var Reader
-     */
-    protected $reader;
-
-    /**
      */
     public function register()
     {
@@ -35,9 +28,6 @@ class Service extends \think\Service
         $this->registerGuard();
         $this->app->bind('auth.permission', Permission::class);
         $this->registerAccessGate();
-
-        // this method is deprecated（等待替换注解为php原生）
-        AnnotationRegistry::registerLoader('\class_exists');
     }
 
     public function boot()

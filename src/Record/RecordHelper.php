@@ -19,7 +19,6 @@ class RecordHelper
             $app->instance(RecordContext::class, $ctx);
         }
 
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $app->get(RecordContext::class);
     }
 

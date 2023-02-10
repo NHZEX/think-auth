@@ -13,7 +13,6 @@ use Zxin\Think\Annotation\DumpValue;
 use Zxin\Think\Annotation\Scanning;
 use Zxin\Think\Auth\Annotation\Auth;
 use Zxin\Think\Auth\Annotation\AuthMeta;
-use Zxin\Think\Auth\Annotation\AuthNode;
 use Zxin\Think\Auth\Annotation\Base;
 use Zxin\Think\Auth\Exception\AuthException;
 use function array_merge;
@@ -153,11 +152,6 @@ class AuthScan
                 foreach ($annotations as $auth) {
                     if ($auth instanceof Base) {
                         $this->handleAttributes($auth, $methodPath, $nodeUrl, $controllerUrl, $methodName);
-                    } elseif ($auth instanceof AuthNode) {
-                        throw new \RuntimeException(
-                            sprintf('%s is deprecated. Use %s instead.', AuthNode::class, AuthMeta::class),
-                            E_USER_DEPRECATED
-                        );
                     }
                 }
 
