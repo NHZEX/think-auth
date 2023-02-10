@@ -1,0 +1,10 @@
+parameters:
+    level: 5
+    paths:
+        - src
+    scanFiles:
+        - vendor/topthink/framework/src/helper.php
+    stubFiles:
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+includes:
