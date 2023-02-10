@@ -3,8 +3,6 @@
 namespace Zxin\Think\Auth\Record;
 
 use Throwable;
-use function get_class;
-use function sprintf;
 
 class RecordContext
 {
@@ -44,7 +42,7 @@ class RecordContext
     public function setException(Throwable $throwable): RecordContext
     {
         $this->code = $throwable->getCode();
-        $this->message = sprintf('%s [%s]', $throwable->getMessage(), get_class($throwable));
+        $this->message = sprintf('%s [%s]', $throwable->getMessage(), \get_class($throwable));
         return $this;
     }
 

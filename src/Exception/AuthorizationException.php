@@ -1,10 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth\Exception;
 
-use Zxin\Think\Auth\Access\Response;
 use Throwable;
+use Zxin\Think\Auth\Access\Response;
 
 class AuthorizationException extends AuthException
 {

@@ -3,7 +3,6 @@
 namespace Zxin\Think\Auth\Record;
 
 use Throwable;
-use function app;
 
 class RecordHelper
 {

@@ -1,10 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth\Facade;
 
-use Zxin\Think\Auth\AuthGuard;
 use think\Facade;
+use Zxin\Think\Auth\AuthGuard;
 use Zxin\Think\Auth\Contracts\Authenticatable;
 
 /**

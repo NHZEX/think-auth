@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth\Access;
@@ -84,7 +85,7 @@ class Response
      */
     public function denied()
     {
-        return ! $this->allowed();
+        return !$this->allowed();
     }
 
     /**

@@ -1,14 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
-
-use function array_pop;
-use function array_values;
-use function count;
-use function explode;
-use function implode;
-use function ksort;
 
 /**
  * Trait InteractsWithStorage
@@ -18,46 +12,46 @@ trait InteractsWithStorage
 {
     protected function build(): array
     {
-        $output = [
-            'features'   => $this->nodes,
-            'permission' => $this->fillPermission($this->permissions, []),
-            'permission2features' => [],
-            'features2permission' => [],
-        ];
+        $permissionList = $this->fillPermission($this->permissions, []);
 
         $permission = Permission::getInstance();
         if ($permission->hasStorage()) {
-            foreach ($output['permission'] as $key => $item) {
+            foreach ($permissionList as $key => $item) {
                 if ($info = $permission->queryPermission($key)) {
                     $item['sort'] = (int) $info['sort'];
                     $item['desc'] = $info['desc'];
-                    $output['permission'][$key] = $item;
+                    $permissionList[$key] = $item;
                 }
             }
         }
 
-        $permission2features = &$output['permission2features'];
-        foreach ($output['permission'] as $permission => $data) {
-            $permission2features[$permission] = array_merge(
-                $permission2features[$permission] ?? [],
+        $permission2features = [];
+        foreach ($permissionList as $pKey => $data) {
+            $permission2features[$pKey] = array_merge(
+                $permission2features[$pKey] ?? [],
                 $data['allow'] ?? []
             );
         }
 
-        $features2permission = &$output['features2permission'];
-        foreach ($output['permission2features'] as $permission => $features) {
+        $features2permission = [];
+        foreach ($permission2features as $permission => $features) {
             foreach ($features as $feature) {
                 $features2permission[$feature][$permission] = true;
             }
         }
 
-        return $output;
+        return [
+            'features'   => $this->nodes,
+            'permission' => $permissionList,
+            'permission2features' => $permission2features,
+            'features2permission' => $features2permission,
+        ];
     }
 
     /**
      * @param array $data
      * @param array $original
-     * @return array
+     * @return array<string, array>
      */
     protected function fillPermission(array $data, array $original): array
     {
@@ -109,13 +103,13 @@ trait InteractsWithStorage
     {
         $delimiter = '.';
         $parents = explode($delimiter, $permission) ?: [];
-        if (1 === count($parents)) {
+        if (1 === \count($parents)) {
             return self::ROOT_NODE;
         }
         array_pop($parents);
         $result = implode($delimiter, $parents);
 
-        while (count($parents)) {
+        while (\count($parents)) {
             $curr = implode($delimiter, $parents);
             array_pop($parents);
             $parent = implode($delimiter, $parents) ?: self::ROOT_NODE;

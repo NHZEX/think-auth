@@ -25,7 +25,7 @@ class AuthManager
 
     /**
      */
-    public static function user():? Authenticatable
+    public static function user(): ?Authenticatable
     {
         return self::instance()->user();
     }
@@ -41,7 +41,7 @@ class AuthManager
     /**
      * @return object|AuthContext|null
      */
-    public static function context():? AuthContext
+    public static function context(): ?AuthContext
     {
         return AuthContext::get();
     }
@@ -49,7 +49,7 @@ class AuthManager
     /**
      * @return array|null
      */
-    public static function getPermissions():? array
+    public static function getPermissions(): ?array
     {
         $user = self::user();
         if (empty($user)) {

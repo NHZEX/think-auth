@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\Reader;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -15,20 +17,12 @@ use Zxin\Think\Auth\Annotation\Auth;
 use Zxin\Think\Auth\Annotation\AuthMeta;
 use Zxin\Think\Auth\Annotation\Base;
 use Zxin\Think\Auth\Exception\AuthException;
-use function array_merge;
-use function is_array;
-use function sprintf;
-use function str_replace;
-use function strlen;
-use function strpos;
-use function strtolower;
-use function substr;
 
 class AuthScan
 {
     use InteractsWithStorage;
 
-    const ROOT_NODE = '__ROOT__';
+    public const ROOT_NODE = '__ROOT__';
 
     /**
      * @var App
@@ -119,13 +113,13 @@ class AuthScan
             $isApp = (0 !== strpos($class, $namespaces . $controllerLayer));
 
             if ($isApp) {
-                $controllerUrl = substr($class, strlen($namespaces));
+                $controllerUrl = substr($class, \strlen($namespaces));
                 $appPos        = strpos($controllerUrl, '\\');
                 $appName       = substr($controllerUrl, 0, $appPos);
-                $controllerUrl = substr($controllerUrl, $appPos + strlen($controllerLayer . '\\') + 1);
+                $controllerUrl = substr($controllerUrl, $appPos + \strlen($controllerLayer . '\\') + 1);
                 $controllerUrl = $appName . '/' . strtolower(str_replace('\\', '.', $controllerUrl));
             } else {
-                $controllerUrl = substr($class, strlen($namespaces . $controllerLayer . '\\'));
+                $controllerUrl = substr($class, \strlen($namespaces . $controllerLayer . '\\'));
                 $controllerUrl = strtolower(str_replace('\\', '.', $controllerUrl));
             }
 
@@ -143,7 +137,7 @@ class AuthScan
                 $methodPath = $class . '::' . $methodName;
 
                 if (PHP_VERSION_ID >= 80000) {
-                    foreach ($refMethod->getAttributes(Base::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                    foreach ($refMethod->getAttributes(Base::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
                         $this->handleAttributes($attribute->newInstance(), $methodPath, $nodeUrl, $controllerUrl, $methodName);
                     }
                 }
@@ -184,7 +178,7 @@ class AuthScan
         }
         $authStr  = $this->parseAuth($auth->name, $controllerUrl, $methodName);
         $features = "node@{$nodeUrl}";
-        if (isset($this->permissions[$authStr]['allow']) && !is_array($this->permissions[$authStr]['allow'])) {
+        if (isset($this->permissions[$authStr]['allow']) && !\is_array($this->permissions[$authStr]['allow'])) {
             $this->permissions[$authStr]['allow'] = [];
         }
         $this->permissions[$authStr]['allow'][] = $features;

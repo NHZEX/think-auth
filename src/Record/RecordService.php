@@ -8,8 +8,6 @@ use think\event\HttpEnd;
 use think\Response;
 use think\Service;
 use Zxin\Think\Auth\AuthContext;
-use function array_merge;
-use function class_exists;
 
 class RecordService extends Service
 {
@@ -36,7 +34,7 @@ class RecordService extends Service
         $this->listen();
 
         $this->app->bind(RecordAdapterInterface::class, function () {
-            $adapter = new $this->config['adapter'];
+            $adapter = new $this->config['adapter']();
             if (!$adapter instanceof RecordAdapterInterface) {
                 throw new RuntimeException('record adapter interface invalid');
             }

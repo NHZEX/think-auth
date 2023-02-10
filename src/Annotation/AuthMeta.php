@@ -2,6 +2,7 @@
 
 namespace Zxin\Think\Auth\Annotation;
 
+use Attribute;
 use Doctrine\Common\Annotations\Annotation;
 use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
 
@@ -12,7 +13,7 @@ use Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor;
  * @Annotation\Target({"CLASS", "METHOD"})
  * @NamedArgumentConstructor
  */
-#[\Attribute(\Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
+#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final class AuthMeta extends Base
 {
     /**

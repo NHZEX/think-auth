@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth\Traits;
 
-use Zxin\Think\Auth\Listens\AuthenticatedEvent;
-use Zxin\Think\Auth\Listens\LoginEvent;
 use think\Container;
 use think\Event;
+use Zxin\Think\Auth\Listens\AuthenticatedEvent;
+use Zxin\Think\Auth\Listens\LoginEvent;
 
 /**
  * Trait EventHelpers

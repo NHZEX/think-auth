@@ -1,13 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
 use think\App;
 use Zxin\Think\Auth\Exception\AuthException;
-use function is_callable;
-use function is_dir;
-use function str_replace;
 
 class Permission
 {
@@ -59,10 +57,10 @@ class Permission
         int $level = 0,
         ?array $data = null,
         callable $filter = null
-    ) :array {
+    ): array {
         if (null === $data) {
             $data = array_merge([], $this->loadStorage()->permission);
-            if (is_callable($data)) {
+            if (\is_callable($data)) {
                 $data = $filter($data);
             }
             usort($data, function ($a, $b) {

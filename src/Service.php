@@ -1,19 +1,16 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth;
 
+use Closure;
+use RuntimeException;
 use think\App;
 use think\Container;
 use Zxin\Think\Auth\Access\Gate;
 use Zxin\Think\Auth\Contracts\Authenticatable;
 use Zxin\Think\Auth\Contracts\Guard;
-use function array_keys;
-use function class_exists;
-use function get_class;
-use function is_object;
-use function is_string;
-use function is_subclass_of;
 
 class Service extends \think\Service
 {
@@ -49,23 +46,23 @@ class Service extends \think\Service
         $guard = $app->config->get('auth.guardProvider');
         if (empty($guard)) {
             return $app->invokeClass(AuthGuard::class);
-        } elseif (is_string($guard)) {
+        } elseif (\is_string($guard)) {
             if (is_subclass_of($guard, Guard::class)) {
                 return $app->invokeClass($guard);
             } else {
-                throw new \RuntimeException("invalid guard: {$guard}");
+                throw new RuntimeException("invalid guard: {$guard}");
             }
-        } elseif ($guard instanceof \Closure) {
+        } elseif ($guard instanceof Closure) {
             $instance = $app->invokeFunction($guard);
-            if (!is_object($instance)) {
-                throw new \RuntimeException("invalid guard, not an object");
+            if (!\is_object($instance)) {
+                throw new RuntimeException("invalid guard, not an object");
             }
             if (!($instance instanceof Guard)) {
-                throw new \RuntimeException('invalid guard: ' . get_class($instance));
+                throw new RuntimeException('invalid guard: ' . \get_class($instance));
             }
             return $instance;
         } else {
-            throw new \RuntimeException("invalid guard provider");
+            throw new RuntimeException("invalid guard provider");
         }
     }
 

@@ -1,11 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Zxin\Think\Auth\Access;
 
-use Zxin\Think\Auth\Exception\AuthorizationException;
 use think\Container;
 use think\exception\FuncNotFoundException;
+use Zxin\Think\Auth\Exception\AuthorizationException;
 
 class Gate
 {
@@ -187,7 +188,7 @@ class Gate
     public function raw($ability, $arguments = [])
     {
         $user = $this->resolveUser();
-        $arguments = is_array($arguments) ? $arguments : (array) $arguments;
+        $arguments = \is_array($arguments) ? $arguments : (array) $arguments;
 
         $result = $this->callBeforeCallbacks($user, $ability, $arguments);
 
@@ -225,7 +226,7 @@ class Gate
     protected function callBeforeCallbacks($user, $ability, array $arguments)
     {
         foreach ($this->beforeCallbacks as $before) {
-            if (! is_null($result = $this->container->invoke($before, [$user, $ability, $arguments]))) {
+            if (!\is_null($result = $this->container->invoke($before, [$user, $ability, $arguments]))) {
                 return $result;
             }
         }
@@ -246,7 +247,7 @@ class Gate
         foreach ($this->afterCallbacks as $after) {
             $afterResult = $this->container->invoke($after, [$user, $ability, $result, $arguments]);
 
-            $result = $result ?? $afterResult;
+            $result ??= $afterResult;
         }
 
         return $result;
@@ -261,7 +262,7 @@ class Gate
         if (isset($this->abilities[$ability])) {
             $callback = $this->abilities[$ability];
 
-            if (is_string($callback)) {
+            if (\is_string($callback)) {
                 return $this->getAlias($callback);
             }
         }
@@ -276,7 +277,7 @@ class Gate
      */
     protected function resolveUser()
     {
-        return call_user_func($this->userResolver);
+        return \call_user_func($this->userResolver);
     }
 
     /**
