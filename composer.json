@@ -14,7 +14,7 @@
         "doctrine/annotations": "^2.0",
         "symfony/polyfill-php80": "^1.25",
         "topthink/framework": "^6.0.3|^6.1|^8.0",
-        "zxin/think-annotation": "2.x-dev",
+        "zxin/think-annotation": "^2.0",
         "zxin/utils": "^2.3"
     },
     "require-dev": {
